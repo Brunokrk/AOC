@@ -96,7 +96,9 @@ if_linha_quinze:
 	addi $a0, $a0, -1 #n-1
 	
 	#Aqui teriamos duas chamadas recursivas com (n-1), porém não estamos conseguindo fazer ambas começando no
-	#mesmo valor, visto que após uma terminar, não conseguimos voltar o valor inicial de n
+	#mesmo valor, visto que após uma terminar, não conseguimos voltar o valor inicial de n, então a proxima chamada
+	#ja vai usar um valor de n = 1, sempre.
+	#Ou seja, a segunda chamada recursiva dentro do if está sempre retornando um valor errado, refletindo no valor final 
 	
 	jal contar #contar(n-1, 0)
 	move $s0, $v0 #move para s0 o resultado da chamada "contar(n-1, 0)"
