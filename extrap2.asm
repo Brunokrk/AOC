@@ -94,6 +94,10 @@ if_linha_nove:
 
 if_linha_quinze:
 	addi $a0, $a0, -1 #n-1
+	
+	#Aqui teriamos duas chamadas recursivas com (n-1), porém não estamos conseguindo fazer ambas começando no
+	#mesmo valor, visto que após uma terminar, não conseguimos voltar o valor inicial de n
+	
 	jal contar #contar(n-1, 0)
 	move $s0, $v0 #move para s0 o resultado da chamada "contar(n-1, 0)"
 	
@@ -111,4 +115,3 @@ if_linha_quinze:
 end:
 	li $v0, 10
 	syscall
-
