@@ -6,7 +6,7 @@ fim_str: .asciiz " digitos sem 1 ’s consecutivos \n "
 
 	.text
 	
-	#Equipe: Bruno Marchi Pires
+	#Aluno: Bruno Marchi Pires
 	
 	.globl main
 main:
@@ -17,9 +17,9 @@ main:
 	ori $v0, $zero, 5
 	syscall
 	
-	ori $a0, $v0, 0 # n = %v0 -> argumento para função
-	
+	ori $a0, $v0, 0 # n = $v0 -> argumento para função
 	li $a1, 0  # a1 = 0 -> argumento para função (ultimo_digito)
+	ori $a2, $v0, 0 #não existe no cod C, mas necessário para ajudar na recursão, inicialmente $a0 == $a2
 	
 	jal contar
 	
@@ -55,10 +55,11 @@ contar:
 	beq $a0, 1, if_linha_oito #if (n==1)
 	
 	#salvando contexto
-	addi $sp, $sp, -12
+	addi $sp, $sp, -16
 	sw $a0, 0($sp)
 	sw $a1, 4($sp)
-	sw $ra, 8($sp)
+	sw $a3, 8($sp)
+	sw $ra, 12($sp)
 	
 	beq $a1, 0, if_linha_quinze #if (ultimo_digito == 0)
 	
@@ -70,8 +71,9 @@ contar:
 	#restaurando
 	lw $a0, 0($sp)
 	lw $a1, 4($sp)
-	lw $ra, 8($sp)
-	addi $sp, $sp, 12
+	lw $a3, 8($sp)
+	lw $ra, 12($sp)
+	addi $sp, $sp, 16
 	
 	jr $ra
 	
@@ -98,17 +100,27 @@ if_linha_quinze:
 	move $s0, $v0 #move para s0 o resultado da chamada "contar(n-1, 0)"
 	
 	ori $a1, $zero, 1 #ultimo_digito = 1
+	addi $a2, $a2, -1
+	move $a0, $a2
 	jal contar #contar(n-1, 1)
 	move $s1, $v0 #move para s1 o resultado da chamada "contar(n-1, 1)"
 	
 	add $v0, $s0, $s1 #contar(n-1, 0) + contar(n-1, 1)
+	
+	#restaurando
 	lw $a0, 0($sp)
 	lw $a1, 4($sp)
-	lw $ra, 8($sp)
-	addi $sp, $sp, 12
+	lw $a3, 8($sp)
+	lw $ra, 12($sp)
+	addi $sp, $sp, 16
 	jr $ra
 
 end:
 	li $v0, 10
 	syscall
 
+#Observações Gerais: O argumento A3, existe apenas para auxiliar quando entramos no if_linha_quinze
+#servindo como uma "ancora" para o valor inicial de a0 (o valor que entra no if).
+#Essa ancora é necessária dentro da lógica desenvolvida, pois a cada iteração decrementamos o valor de a0 em 1, e possuímos duas
+#chamadas recursivas, que devem iniciar com o mesmo valor de a0. então quando partimos para a segunda chamada recursiva, transferimos o valor da
+#ancora para a0, restaurando assim seu valor inicial. Dessa forma eu consegui chegar mais próximo do resultado esperado. 
